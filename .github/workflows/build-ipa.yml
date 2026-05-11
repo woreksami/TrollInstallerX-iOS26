@@ -36,11 +36,15 @@ jobs:
 
       - name: Package IPA
         run: |
-          mkdir -p $RUNNER_TEMP/ipa/Payload
-          cp -r $RUNNER_TEMP/TrollInstallerX.xcarchive/Products/Applications/TrollInstallerX.app \
-                $RUNNER_TEMP/ipa/Payload/
-          ldid -S $RUNNER_TEMP/ipa/Payload/TrollInstallerX.app/TrollInstallerX
-          cd $RUNNER_TEMP/ipa && zip -r $RUNNER_TEMP/TrollInstallerX-iOS26.ipa Payload/
+          if [ -f TrollInstallerX.ipa ]; then
+            cp TrollInstallerX.ipa $RUNNER_TEMP/TrollInstallerX-iOS26.ipa
+          else
+            mkdir -p $RUNNER_TEMP/ipa/Payload
+            cp -r "$RUNNER_TEMP/TrollInstallerX.xcarchive/Products/Applications/TrollInstallerX.app" \
+                  $RUNNER_TEMP/ipa/Payload/
+            ldid -S $RUNNER_TEMP/ipa/Payload/TrollInstallerX.app/TrollInstallerX
+            cd $RUNNER_TEMP/ipa && zip -r $RUNNER_TEMP/TrollInstallerX-iOS26.ipa Payload/
+          fi
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
