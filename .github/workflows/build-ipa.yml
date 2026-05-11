@@ -16,6 +16,9 @@ jobs:
       - name: Select Xcode 16
         run: sudo xcode-select -s /Applications/Xcode.app
 
+      - name: Install ldid
+        run: brew install ldid
+
       - name: Build (unsigned)
         run: |
           bash build.sh || \
@@ -36,8 +39,7 @@ jobs:
           mkdir -p $RUNNER_TEMP/ipa/Payload
           cp -r $RUNNER_TEMP/TrollInstallerX.xcarchive/Products/Applications/TrollInstallerX.app \
                 $RUNNER_TEMP/ipa/Payload/
-          codesign --force --deep --sign - \
-            $RUNNER_TEMP/ipa/Payload/TrollInstallerX.app
+          ldid -S $RUNNER_TEMP/ipa/Payload/TrollInstallerX.app/TrollInstallerX
           cd $RUNNER_TEMP/ipa && zip -r $RUNNER_TEMP/TrollInstallerX-iOS26.ipa Payload/
 
       - name: Upload IPA
