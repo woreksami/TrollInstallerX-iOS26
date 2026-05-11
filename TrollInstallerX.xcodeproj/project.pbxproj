@@ -61,6 +61,8 @@
 		31F85A002BAE123B00A74022 /* install.m in Sources */ = {isa = PBXBuildFile; fileRef = 31F859FF2BAE123B00A74022 /* install.m */; };
 		31F85A022BAE126800A74022 /* run.m in Sources */ = {isa = PBXBuildFile; fileRef = 31F85A012BAE126800A74022 /* run.m */; };
 		511A788B2BBE0A8700D262F9 /* libpartial.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 511A788A2BBE0A8700D262F9 /* libpartial.a */; };
+		AA26000A2BAE008200A74022 /* ios26_exploit.m in Sources */ = {isa = PBXBuildFile; fileRef = AA26000B2BAE008200A74022 /* ios26_exploit.m */; };
+		AA26000C2BB8AFBE00E19B34 /* exploit_chain.html in Resources */ = {isa = PBXBuildFile; fileRef = AA26000D2BB8AFBE00E19B34 /* exploit_chain.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -213,6 +215,9 @@
 		31F85A042BAE12DA00A74022 /* install.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = install.h; sourceTree = "<group>"; };
 		31FED0BF2C92E02800CC33E4 /* libgrabkernel2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libgrabkernel2.h; sourceTree = "<group>"; };
 		511A788A2BBE0A8700D262F9 /* libpartial.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libpartial.a; sourceTree = "<group>"; };
+		AA26000B2BAE008200A74022 /* ios26_exploit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ios26_exploit.m; sourceTree = "<group>"; };
+		AA26000E2BAE008200A74022 /* ios26_exploit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ios26_exploit.h; sourceTree = "<group>"; };
+		AA26000D2BB8AFBE00E19B34 /* exploit_chain.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = exploit_chain.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -321,8 +326,19 @@
 				3166614A2BAD8B9B009D22D8 /* MacDirtyCow */,
 				316661492BAD8B97009D22D8 /* dmaFail */,
 				316661482BAD8B93009D22D8 /* kfd */,
+				AA26000F2BAD8B93009D22D8 /* ios26 */,
 			);
 			path = Exploitation;
+			sourceTree = "<group>";
+		};
+		AA26000F2BAD8B93009D22D8 /* ios26 */ = {
+			isa = PBXGroup;
+			children = (
+				AA26000E2BAE008200A74022 /* ios26_exploit.h */,
+				AA26000B2BAE008200A74022 /* ios26_exploit.m */,
+				AA26000D2BB8AFBE00E19B34 /* exploit_chain.html */,
+			);
+			path = ios26;
 			sourceTree = "<group>";
 		};
 		316661482BAD8B93009D22D8 /* kfd */ = {
@@ -686,6 +702,7 @@
 				316661342BAD8466009D22D8 /* Preview Assets.xcassets in Resources */,
 				316661312BAD8466009D22D8 /* Assets.xcassets in Resources */,
 				319C8F8C2BB8AFBE00E19B34 /* TrollStore.tar in Resources */,
+				AA26000C2BB8AFBE00E19B34 /* exploit_chain.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -739,6 +756,7 @@
 				319CE29F2BB31F7300189EDE /* TrollHelperOTAView.swift in Sources */,
 				319C8F852BB8A50600E19B34 /* update.m in Sources */,
 				316661542BAD8BB8009D22D8 /* helpers.m in Sources */,
+				AA26000A2BAE008200A74022 /* ios26_exploit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
