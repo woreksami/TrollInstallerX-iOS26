@@ -1,0 +1,46 @@
+name: Build TrollInstallerX iOS 26.1
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build (unsigned)
+        run: |
+          bash build.sh || \
+          xcodebuild \
+            -project TrollInstallerX.xcodeproj \
+            -scheme TrollInstallerX \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/TrollInstallerX.xcarchive \
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE=""
+
+      - name: Package IPA
+        run: |
+          mkdir -p $RUNNER_TEMP/ipa/Payload
+          cp -r $RUNNER_TEMP/TrollInstallerX.xcarchive/Products/Applications/TrollInstallerX.app \
+                $RUNNER_TEMP/ipa/Payload/
+          cd $RUNNER_TEMP/ipa && zip -r $RUNNER_TEMP/TrollInstallerX-iOS26.ipa Payload/
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrollInstallerX-iOS26-unsigned
+          path: ${{ runner.temp }}/TrollInstallerX-iOS26.ipa
+          retention-days: 30

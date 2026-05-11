@@ -45,7 +45,7 @@ struct MainView: View {
                             Text("By Alfie CG")
                                 .font(.system(size: 17, weight: .semibold, design: .rounded))
                                 .foregroundColor(.white.opacity(0.5))
-                            Text("iOS 14.0 - 16.6.1")
+                            Text("iOS 14.0 - 16.6.1 | iOS 26.0 - 26.1")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(.white.opacity(0.5))
                         }

@@ -19,6 +19,8 @@ enum CPUFamily {
     case A14
     case A15
     case A16
+    case A17   // iPhone 15 Pro — iOS 26.1 supported via ios26_exploit
+    case A18   // iPhone 16 Pro — iOS 26.1 supported via ios26_exploit
 }
 
 struct Device {
@@ -70,6 +72,10 @@ struct Device {
             self.cpuFamily = .A15
         case 0x8765EDEA:
             self.cpuFamily = .A16
+        case 0xFA33E5DC:
+            self.cpuFamily = .A17  // A17 Pro (iPhone 15 Pro) — verify cpufamily constant
+        case 0x72015832:
+            self.cpuFamily = .A18  // A18 Pro (iPhone 16 Pro) — verify cpufamily constant
         default:
             self.cpuFamily = .Unknown
         }
@@ -103,6 +109,10 @@ struct Device {
         
         if self.cpuFamily == .A8 {
             isSupported = self.version < Version("15.2")
+        } else if self.version >= Version("26.0") && self.version <= Version("26.1") {
+            // iOS 26.x — supported via ios26_exploit (XNU 12377.61.12 bootstrap)
+            // Bugs: ArrayStorage.h:112, webcontent-defines.sb:113, task.h:334
+            isSupported = true
         } else {
             isSupported = (self.version <= Version("16.6.1")) || (self.isOnSupported17Beta && !((self.cpuFamily == .A15 && !isM2) || self.cpuFamily == .A16))
         }
@@ -116,11 +126,17 @@ struct Device {
     }
     
     var supportsDirectInstall: Bool {
+        // iOS 26.x always uses direct install path via ios26_exploit
+        if self.version >= Version("26.0") { return true }
         if !self.isArm64e { return true }
         if self.cpuFamily == .A15 || self.cpuFamily == .A16 {
             return self.version < Version("16.5.1")
         } else {
             return self.version < Version("16.6")
         }
+    }
+
+    var isIOS26: Bool {
+        return self.version >= Version("26.0") && self.version <= Version("26.1")
     }
 }

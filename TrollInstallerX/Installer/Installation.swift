@@ -63,6 +63,9 @@ func cleanupPrivatePreboot() -> Bool {
 }
 
 func selectExploit(_ device: Device) -> KernelExploit {
+    // iOS 26.x — always use ios26_exploit (XNU 12377.61.12 bootstrap)
+    if device.isIOS26 { return ios26_exploit }
+
     let flavour = (TIXDefaults().string(forKey: "exploitFlavour") ?? (physpuppet.supports(device) ? "physpuppet" : "landa"))
     if flavour == "landa" { return landa }
     if flavour == "physpuppet" { return physpuppet }
@@ -87,27 +90,46 @@ func doDirectInstall(_ device: Device) async -> Bool {
     let supportsFullPhysRW = !(device.cpuFamily == .A8 && device.version > Version("15.1.1")) && ((device.isArm64e && device.version >= Version(major: 15, minor: 2)) || (!device.isArm64e && device.version >= Version("15.0")))
     
     Logger.log("Running on an \(device.modelIdentifier) on iOS \(device.version.readableString)")
-    
-    if !iOS14 {
-        if !(getKernel(device)) {
-            Logger.log("Failed to get kernel", type: .error)
+
+    // iOS 26.x: skip xpf patchfinder (not yet updated for XNU 12377.61.12)
+    // ios26_exploit uses hardcoded offsets from source analysis + IOSurface KASLR leak
+    if !device.isIOS26 {
+        if !iOS14 {
+            if !(getKernel(device)) {
+                Logger.log("Failed to get kernel", type: .error)
+                return false
+            }
+        }
+
+        Logger.log("Gathering kernel information")
+        if !initialise_kernel_info(kernelPath, iOS14) {
+            Logger.log("Failed to patchfind kernel", type: .error)
             return false
         }
+    } else {
+        Logger.log("iOS 26.1: skipping xpf patchfinder (using source-derived offsets)")
+        Logger.log("Bugs: ArrayStorage.h:112, task.h:334, webcontent-defines.sb:113")
     }
-    
-    Logger.log("Gathering kernel information")
-    if !initialise_kernel_info(kernelPath, iOS14) {
-        Logger.log("Failed to patchfind kernel", type: .error)
-        return false
-    }
-    
+
     Logger.log("Exploiting kernel (\(exploit.name))")
     if !exploit.initialise() {
         Logger.log("Failed to exploit the kernel", type: .error)
         return false
     }
     Logger.log("Successfully exploited the kernel", type: .success)
-    post_kernel_exploit(iOS14)
+
+    // iOS 26.x: use ios26_escalate instead of libjailbreak post-exploit setup
+    // (libjailbreak uses dynamic offsets from xpf; we use hardcoded XNU 12377.61.12 offsets)
+    if device.isIOS26 {
+        Logger.log("iOS 26.1: running ios26_escalate (task.h:334 proc_ro path)")
+        if !ios26_escalate() {
+            Logger.log("Failed to escalate via ios26 path", type: .error)
+            return false
+        }
+        Logger.log("uid=0 confirmed via ios26_escalate", type: .success)
+    } else {
+        post_kernel_exploit(iOS14)
+    }
     
     var trollstoreTarData: Data?
     if FileManager.default.fileExists(atPath: docsDir + "/TrollStore.tar") {
