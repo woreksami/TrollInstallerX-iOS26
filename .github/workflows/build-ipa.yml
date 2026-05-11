@@ -37,14 +37,27 @@ jobs:
       - name: Package IPA
         run: |
           if [ -f TrollInstallerX.ipa ]; then
-            cp TrollInstallerX.ipa $RUNNER_TEMP/TrollInstallerX-iOS26.ipa
+            APP_SRC="DerivedData/TrollInstallerX/Build/Products/Release-iphoneos/TrollInstallerX.app"
           else
             mkdir -p $RUNNER_TEMP/ipa/Payload
             cp -r "$RUNNER_TEMP/TrollInstallerX.xcarchive/Products/Applications/TrollInstallerX.app" \
                   $RUNNER_TEMP/ipa/Payload/
-            ldid -S $RUNNER_TEMP/ipa/Payload/TrollInstallerX.app/TrollInstallerX
-            cd $RUNNER_TEMP/ipa && zip -r $RUNNER_TEMP/TrollInstallerX-iOS26.ipa Payload/
+            APP_SRC="$RUNNER_TEMP/ipa/Payload/TrollInstallerX.app"
           fi
+
+          APP="$RUNNER_TEMP/ipa/Payload/TrollInstallerX.app"
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          [ -d "$APP" ] || cp -r "$APP_SRC" "$RUNNER_TEMP/ipa/Payload/"
+
+          # Sign frameworks first, then app — generates proper CodeResources
+          if [ -d "$APP/Frameworks" ]; then
+            find "$APP/Frameworks" \( -name "*.dylib" -o -name "*.framework" \) | while read f; do
+              codesign --force --sign - "$f"
+            done
+          fi
+          codesign --force --sign - "$APP"
+
+          cd $RUNNER_TEMP/ipa && zip -r $RUNNER_TEMP/TrollInstallerX-iOS26.ipa Payload/
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
