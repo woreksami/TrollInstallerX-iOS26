@@ -36,6 +36,8 @@ jobs:
           mkdir -p $RUNNER_TEMP/ipa/Payload
           cp -r $RUNNER_TEMP/TrollInstallerX.xcarchive/Products/Applications/TrollInstallerX.app \
                 $RUNNER_TEMP/ipa/Payload/
+          codesign --force --deep --sign - \
+            $RUNNER_TEMP/ipa/Payload/TrollInstallerX.app
           cd $RUNNER_TEMP/ipa && zip -r $RUNNER_TEMP/TrollInstallerX-iOS26.ipa Payload/
 
       - name: Upload IPA
